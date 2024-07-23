@@ -95,29 +95,29 @@ export const login = async (
 ) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) {
-      return next(
-        new AppError(404, "fail", "Please provide email and password")
-      );
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    const user = (await User.findOne({ email }).select(
-      "+password"
-    )) as UserDocument | null;
-    if (!user || !(await user.correctPassword(password, user.password!))) {
-      return next(new AppError(401, "fail", "Email or Password is wrong"));
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid credentials' });
     }
 
     // 3) All correct, send jwt to client
     const token = createToken(user.id);
 
     // Remove the password from the output
-    user.password = undefined;
     res.status(200).json({
       status: "success",
       token,
       data: {
-        user,
+        user: {
+          email,
+          name
+        },
       },
     });
   } catch (err) {
@@ -131,24 +131,26 @@ export const signup = async (
   next: NextFunction
 ) => {
   try {
-    const user = (await User.create({
-      name: req.body.name,
-      email: req.body.email,
-      password: req.body.password,
-      passwordConfirm: req.body.passwordConfirm,
-    })) as UserDocument;
+    const { email, password, name } = req.body;
 
-    const token = createToken(user.id);
+    const existingUser = await User.findOne({ email });
 
-    user.password = undefined;
+    if (existingUser) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
 
-    res.status(201).json({
-      status: "success",
-      token,
-      data: {
-        user,
-      },
-    });
+    const user = User.create({
+      email,
+      password,
+      name
+    })
+    
+
+    const token = createToken((await user).id);
+
+
+    res.status(201).json({ message: 'User registered successfully' });
+
   } catch (err) {
     next(err);
   }

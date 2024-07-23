@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/userController");
 const authController = require("./../controllers/authController");
+import { validateUser } from "../middlewares/validation";
 
 router.post("/login", authController.login);
-router.post("/signup", authController.signup);
+router.post("/signup", validateUser, authController.signup);
 
 // Protect all routes after this middleware
 router.use(authController.protect);
