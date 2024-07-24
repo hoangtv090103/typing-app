@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const rateLimit = require("express-rate-limit");
 const userRoutes = require("./routes/userRoutes");
-const sessionRoutes = require("./routes/sessionRoutes");
+const sessionRoutes = require("./routes/typingSessionRoutes");
 dotenv.config();
 
 const app = express();

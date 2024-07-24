@@ -1,10 +1,15 @@
-import type { Request, Response } from "express";
-const TypingSession = require("../models/typingSessionModel");
-const base = require("./baseController");
+import jwt, { type JwtPayload } from "jsonwebtoken";
 
+import base from "./baseController";
+import TypingSession from "../models/typingSessionModel";
+import type { Request, Response } from "express";
+
+interface DecodedToken extends JwtPayload {
+  id: string;
+}
 interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
+  headers: {
+    authorization: string;
   };
 }
 
@@ -14,19 +19,30 @@ export const getUserTypingSessions = async (
   res: Response
 ) => {
   try {
-    if (!req.user) {
+    if (!req.headers.authorization) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
+    console.log(req.headers.authorization);
+    
+
+    const token = req.headers.authorization.split(" ")[1];
+    
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET as string
+    ) as DecodedToken;
+    
     const typingSessions = await TypingSession.find({
-      userId: req.user.id,
+      userId: decoded.id,
     }).populate("textSampleId");
+
     res.status(200).json({ typingSessions });
   } catch (err) {
     res.status(500).json({ message: "Internal server error", error: err });
   }
 };
 
-exports.createTypingSession = base.createOne(TypingSession);
+export const createTypingSession = base.createOne(TypingSession);
 
-exports.getTypingSessionById = base.getOne(TypingSession);
+export const getTypingSessionById = base.getOne(TypingSession);
