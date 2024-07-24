@@ -13,6 +13,7 @@ interface DecodedToken extends JwtPayload {
 // Type định nghĩa cho User Document, có thể thay đổi tùy theo User Model của bạn
 interface UserDocument {
   id: string;
+  name: string;
   email: string;
   password?: string;
   role: string;
@@ -98,12 +99,12 @@ export const login = async (
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
     // 3) All correct, send jwt to client
@@ -115,8 +116,8 @@ export const login = async (
       token,
       data: {
         user: {
-          email,
-          name
+          name: user.name,
+          email: user.email,
         },
       },
     });
@@ -136,21 +137,18 @@ export const signup = async (
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ message: "User already exists" });
     }
 
     const user = User.create({
       email,
       password,
-      name
-    })
-    
+      name,
+    });
 
     const token = createToken((await user).id);
 
-
-    res.status(201).json({ message: 'User registered successfully' });
-
+    res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
     next(err);
   }
