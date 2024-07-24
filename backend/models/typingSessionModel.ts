@@ -34,3 +34,5 @@ const typingSessionSchema = new Schema({
 
 const TypingSession = mongoose.model("TypingSession", typingSessionSchema);
 module.exports = TypingSession;
+
+export default TypingSession;
