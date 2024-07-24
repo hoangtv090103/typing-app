@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/userController");
 const authController = require("./../controllers/authController");
-import { validateUser } from "../middlewares/validation";
+const { validateUser } = require("../middlewares/validation");
 
 router.post("/login", authController.login);
 router.post("/signup", validateUser, authController.signup);
@@ -13,7 +13,7 @@ router.use(authController.protect);
 router.delete("/deleteMe", userController.deleteMe);
 
 // Only admin have permission to access for the below APIs
-router.use(authController.restrictTo("admin"));
+// router.use(authController.restrictTo("admin"));
 
 router.route("/").get(userController.getAllUsers);
 

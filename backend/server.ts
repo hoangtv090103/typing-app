@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const config = require("./config/db");
+const connectDB = require("./config/db");
 const rateLimit = require("express-rate-limit");
 const userRoutes = require("./routes/userRoutes");
 dotenv.config();
@@ -9,6 +9,7 @@ dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
+connectDB();
 
 // Limit request from the same API
 const limiter = rateLimit({
@@ -20,7 +21,6 @@ const limiter = rateLimit({
 app.use("/api", limiter);
 app.use("/api/v1/users", userRoutes);
 
-config.dbConnect();
 
 const PORT = process.env.PORT;
 
