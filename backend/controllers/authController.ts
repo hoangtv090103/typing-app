@@ -1,5 +1,4 @@
 import { type Request, type Response, type NextFunction } from "express";
-import { promisify } from "util";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 
 import User from "../models/userModel";
