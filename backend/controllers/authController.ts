@@ -40,7 +40,7 @@ export const protect = async (
   try {
     // 1) check if the token is there
     let token: string | undefined;
-    console.log(req.headers.authorization);
+
     if (
       req.headers.authorization &&
       req.headers.authorization.startsWith("Bearer")

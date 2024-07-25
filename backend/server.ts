@@ -10,7 +10,6 @@ dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.set("trust proxy", 1);
 connectDB();
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/sessions", sessionRoutes);

@@ -1,17 +1,9 @@
-const AppError = require("../utils/appError");
-const APIFeatures = require("../utils/apiFeatures");
-import { type NextFunction, type Request, type Response } from "express";
+import type { Request, Response, NextFunction } from "express";
+import AppError from "../utils/appError";
+import APIFeatures from "../utils/apiFeatures";
 
-interface Model {
-  findByIdAndDelete: (id: string) => Promise<any>;
-  findByIdAndUpdate: (id: string, data: any, options: any) => Promise<any>;
-  create: (data: any) => Promise<any>;
-  findById: (id: string) => Promise<any>;
-  find: () => Promise<any>;
-}
-
-exports.deleteOne =
-  (Model: Model) =>
+export const deleteOne =
+  (Model: any) =>
   async (req: Request & { params: any }, res: Response, next: NextFunction) => {
     try {
       const doc = await Model.findByIdAndDelete(req.params.id);
@@ -28,8 +20,8 @@ exports.deleteOne =
     }
   };
 
-exports.updateOne =
-  (Model: Model) =>
+export const updateOne =
+  (Model: any) =>
   async (req: Request & { params: any }, res: Response, next: NextFunction) => {
     try {
       const doc = await Model.findByIdAndUpdate(req.params.id, req.body, {
@@ -54,8 +46,8 @@ exports.updateOne =
     }
   };
 
-exports.createOne =
-  (Model: Model) =>
+export const createOne =
+  (Model: any) =>
   async (req: Request & { params: any }, res: Response, next: NextFunction) => {
     try {
       const doc = await Model.create(req.body);
@@ -71,8 +63,8 @@ exports.createOne =
     }
   };
 
-exports.getOne =
-  (Model: Model) =>
+export const getOne =
+  (Model: any) =>
   async (req: Request & { params: any }, res: Response, next: NextFunction) => {
     try {
       const doc = await Model.findById(req.params.id);
@@ -94,9 +86,10 @@ exports.getOne =
     }
   };
 
-exports.getAll =
-  (Model: Model) => async (req: Request, res: Response, next: NextFunction) => {
+export const getAll =
+  (Model: any) => async (req: Request, res: Response, next: NextFunction) => {
     try {
+      // TODO: Fix Model.find is not a function
       const features = new APIFeatures(Model.find(), req.query)
         .sort()
         .paginate();
