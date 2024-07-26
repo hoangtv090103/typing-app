@@ -89,7 +89,6 @@ export const getOne =
 export const getAll =
   (Model: any) => async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // TODO: Fix Model.find is not a function
       const features = new APIFeatures(Model.find(), req.query)
         .sort()
         .paginate();
@@ -99,9 +98,7 @@ export const getAll =
       res.status(200).json({
         status: "success",
         results: doc.length,
-        data: {
-          data: doc,
-        },
+        data: doc,
       });
     } catch (error) {
       next(error);
