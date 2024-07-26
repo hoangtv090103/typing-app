@@ -3,19 +3,20 @@ const router = express.Router();
 const userController = require("../controllers/userController");
 const authController = require("./../controllers/authController");
 const { validateUser } = require("../middlewares/validation");
+const protect = require("../middlewares/protect");
 
 router.post("/login", authController.login);
 router.post("/signup", validateUser, authController.signup);
 
 // Protect all routes after this middleware
-router.use(authController.protect);
+router.use(protect);
 
 router.delete("/deleteMe", userController.deleteMe);
 
 // Only admin have permission to access for the below APIs
 // router.use(authController.restrictTo("admin"));
 
-router.get('/', userController.getAllUsers);
+router.get("/", userController.getAllUsers);
 
 router
   .route("/:id")

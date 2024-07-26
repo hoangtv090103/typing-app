@@ -6,7 +6,11 @@ const typingSessionSchema = new Schema({
     ref: "User",
     required: true,
   },
-  textSample: {
+  originalText: {
+    type: String,
+    required: true,
+  },
+  typedText: {
     type: String,
     required: true,
   },
