@@ -48,7 +48,7 @@ export const login = async (
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // 3) All correct, send jwt to client
+    // All correct, send jwt to client
     const token = createToken(user.id);
 
     // Remove the password from the output

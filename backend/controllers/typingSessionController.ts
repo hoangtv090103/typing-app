@@ -44,8 +44,8 @@ export const getUserTypingSessions = async (
     }).populate("textSampleId");
 
     res.status(200).json({ typingSessions });
-  } catch (err) {
-    res.status(500).json({ message: "Internal server error", error: err });
+  } catch (err: any) {
+    res.status(500).json({ message: "Internal server error", error: err.message });
   }
 };
 
@@ -82,8 +82,8 @@ export const createTypingSession = async (
       message: "Typing Sessions created successfully",
       data: session,
     });
-  } catch (err) {
-    res.status(500).json({ message: "Internal server error", error: err });
+  } catch (err: any) {
+    res.status(500).json({ message: "Internal server error", error: err.message });
   }
 };
 

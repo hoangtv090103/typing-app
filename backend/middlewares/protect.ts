@@ -25,7 +25,7 @@ const protect = async (
   next: NextFunction
 ) => {
   try {
-    // 1) check if the token is there
+    // Check if the token is there
     let token: string | undefined;
 
     if (
