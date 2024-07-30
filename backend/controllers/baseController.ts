@@ -37,9 +37,8 @@ export const updateOne =
 
       res.status(200).json({
         status: "success",
-        data: {
           doc,
-        },
+
       });
     } catch (error) {
       next(error);
@@ -54,9 +53,8 @@ export const createOne =
 
       res.status(201).json({
         status: "success",
-        data: {
           doc,
-        },
+
       });
     } catch (error) {
       next(error);
@@ -77,9 +75,7 @@ export const getOne =
 
       res.status(200).json({
         status: "success",
-        data: {
           doc,
-        },
       });
     } catch (error) {
       next(error);

@@ -1,33 +1,30 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react'
 
+import './App.css'
+import axios from 'axios'
 function App() {
-  const [count, setCount] = useState(0)
+  const [sampleText, setSampleTesxt] = useState('Hello World')
+  
+  useEffect(() => {
+    const getSampleText = async () => {
+      const res = await axios.get('/api/v1/texts',
+        {
+          headers: {
+            Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YTIxNzU3MmM2ZjRkN2ZlNmIwMTU1NiIsImlhdCI6MTcyMjMyNDQ5NSwiZXhwIjoxNzIyNDEwODk1fQ.N9SPOrLZY6T2kavXwhJ3-13sBJvVQtle2Lo0OMKZvrI"
+          }})
+      const text = res.data.text;
+      setSampleTesxt(text)
+    }
+
+    getSampleText()
+  }, []);
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    <div>
+    <h1> Typing Practice </h1>
+        <p>{ sampleText }</p>
+    </div>
     </>
   )
 }
