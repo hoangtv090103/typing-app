@@ -1,0 +1,44 @@
+/* src/components/TypingTest.css */
+.typing-test {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.sample-text {
+  font-size: 24px;
+  line-height: 1.5;
+  display: flex;
+  /* justify-content: center; */
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  text-align: justify;
+}
+
+.sample-text span {
+  white-space: pre;
+}
+
+.correct {
+  color: #4caf50;
+}
+
+.incorrect {
+  color: #f44336;
+  text-decoration: underline;
+}
+
+.status {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.results {
+  margin-top: 20px;
+  font-size: 18px;
+}
+
+.typing-input {
+  /* opacity: 0; */
+  pointer-events: none; /* Vô hiệu hóa các sự kiện chuột */
+  text-align: justify;
+}
