@@ -7,27 +7,26 @@ interface TypingTestProps {
   onComplete: (wpm: number, accuracy: number) => void;
 }
 
-const TypingTest: React.FC<TypingTestProps> = ({
-  sampleText,
-  onComplete,
-}) => {
+const TypingTest: React.FC<TypingTestProps> = ({ sampleText, onComplete }) => {
   const [userInput, setUserInput] = useState("");
+  const [wpm, setWpm] = useState<number>(0);
   const [startTime, setStartTime] = useState<number | null>(null);
-  const [errors, setErrors] = useState(0);
+  const [errors, setErrors] = useState<number>(0);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  useEffect(() => {
-    // Focus input when component mounts
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, []);
+  // useEffect(() => {
+  //   // Focus input when component mounts
+  //   if (inputRef.current) {
+  //     inputRef.current.focus();
+  //   }
+  // }, []);
 
   useEffect(() => {
     // Reset state when sample text changes
     setUserInput("");
     setStartTime(null);
     setErrors(0);
+    setWpm(0);
   }, [sampleText]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,14 +45,17 @@ const TypingTest: React.FC<TypingTestProps> = ({
       }
     }
     setErrors(errorCount);
+    const endTime = Date.now();
+    const timeTaken = (endTime - startTime!) / 1000 / 60;
+    const words = input.split(" ").length;
+    const wpmResult = words / timeTaken;
+    const accuracy =
+      ((sampleText.length - errorCount) / sampleText.length) * 100;
+
+    setWpm(wpmResult);
 
     // Check if typing is complete
     if (input === sampleText) {
-      const endTime = Date.now();
-      const timeTaken = (endTime - startTime!) / 1000; // time in seconds
-      const wordsTyped = sampleText.split(" ").length;
-      const wpm = (wordsTyped / timeTaken) * 60;
-      const accuracy = ((sampleText.length - errorCount) / sampleText.length) * 100;
       onComplete(wpm, accuracy);
     }
   };
@@ -86,6 +88,7 @@ const TypingTest: React.FC<TypingTestProps> = ({
         autoFocus
       />
       <div className="status">
+        <p>WPM: {wpm.toFixed(2)}</p>
         <p>Errors: {errors}</p>
       </div>
     </div>
