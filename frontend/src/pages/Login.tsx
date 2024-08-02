@@ -3,7 +3,11 @@ import { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
-const Login: React.FC = ({setIsLogged}: any) => {
+interface LoginProps {
+  setIsLogged: (arg0: boolean) => void;
+}
+
+const Login: React.FC<LoginProps> = ({ setIsLogged }) => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -28,11 +32,11 @@ const Login: React.FC = ({setIsLogged}: any) => {
       localStorage.setItem("token", response.data.token);
       setIsLogged(true);
       navigate("/");
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message);
     }
 
-    setLoading(false);
+    setLoading(false); 
   };
 
   return (

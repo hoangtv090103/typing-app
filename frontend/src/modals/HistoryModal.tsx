@@ -1,6 +1,6 @@
-// src/components/Modal.tsx
+// src/components/HistoryModal.tsx
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./HistoryModal.css";
 import axios from "axios";
 
@@ -9,11 +9,26 @@ interface ModalProps {
   onClose: () => void;
 }
 
-const HistoryModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
-  const [sessions, setSessions] = useState([]);
-  if (!isOpen) return null;
+interface Session {
+  _id: number;
+  wpm: number;
+  accuracy: number;
+  mistakes: number;
+  duration: number;
+}
 
-  async function fetchData() {
+const HistoryModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchData();
+    }
+  }, [isOpen]);
+
+  const fetchData = async () => {
+    setLoading(true);
     try {
       const res = await axios.get("/api/v1/sessions", {
         headers: {
@@ -21,13 +36,24 @@ const HistoryModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         },
       });
 
-      setSessions(res.data);
-    } catch (err) {
-      console.log(err);
-    }
-  }
+      console.log(res.data.sessions);
 
-  fetchData();
+      // Ensure the response is in the expected format
+      if (Array.isArray(res.data.sessions)) {
+        setSessions(res.data.sessions);
+      } else {
+        console.error("Unexpected response format: ", res.data.sessions);
+        setSessions([]);
+      }
+    } catch (err) {
+      console.log("Error fetching session data: ", err);
+      setSessions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -36,34 +62,36 @@ const HistoryModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
           &times;
         </button>
         <h2>History</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>WPM</th>
-              <th>Accuracy</th>
-              <th>Mistakes</th>
-              <th>Duration</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sessions.map(
-              (session: {
-                wpm: number;
-                accuracy: number;
-                mistakes: number;
-                duration: number;
-                _id: string;
-              }) => (
-                <tr key={session._id}>
-                  <td>{session.wpm}</td>
-                  <td>{session.accuracy}</td>
-                  <td>{session.mistakes}</td>
-                  <td>{session.duration}</td>
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>WPM</th>
+                <th>Accuracy</th>
+                <th>Mistakes</th>
+                <th>Duration</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sessions.length > 0 ? (
+                sessions.map((session) => (
+                  <tr key={session._id}>
+                    <td>{session.wpm}</td>
+                    <td>{session.accuracy}</td>
+                    <td>{session.mistakes}</td>
+                    <td>{session.duration}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4}>No session history available.</td>
                 </tr>
-              )
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

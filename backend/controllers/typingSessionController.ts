@@ -40,9 +40,12 @@ export const getUserTypingSessions = async (
 
     const typingSessions = await TypingSession.find({
       userId: decoded.id,
-    }).populate("textSampleId");
+    });
 
-    res.status(200).json({ typingSessions });
+    res.status(200).json({
+      message: "Typing sessions retrieved successfully",
+      sessions: typingSessions,
+    });
   } catch (err: any) {
     res
       .status(500)

@@ -63,7 +63,7 @@ const Home: React.FC = () => {
 
   return (
     <>
-      <HistoryModal isOpen={openModal} onClose={() => setOpenModal} />
+      <HistoryModal isOpen={openModal} onClose={() => setOpenModal(false)} />
       <button
         style={{
           position: "fixed",
