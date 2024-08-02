@@ -1,6 +1,9 @@
 /* src/components/TypingTest.css */
 .typing-test {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   margin: 20px 0;
 }
 
@@ -35,10 +38,4 @@
 .results {
   margin-top: 20px;
   font-size: 18px;
-}
-
-.typing-input {
-  /* opacity: 0; */
-  pointer-events: none; /* Vô hiệu hóa các sự kiện chuột */
-  text-align: justify;
 }

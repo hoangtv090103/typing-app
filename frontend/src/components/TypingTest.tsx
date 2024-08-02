@@ -4,34 +4,75 @@ import "./TypingTest.css";
 
 interface TypingTestProps {
   sampleText: string;
-  onComplete: (wpm: number, accuracy: number) => void;
+  onComplete: (sessionData: {
+    wpm: number;
+    accuracy: number;
+    mistakes: number;
+    duration: number;
+    typedText: string;
+  }) => void;
 }
 
 const TypingTest: React.FC<TypingTestProps> = ({ sampleText, onComplete }) => {
   const [userInput, setUserInput] = useState("");
-  const [wpm, setWpm] = useState<number>(0);
-  const [startTime, setStartTime] = useState<number | null>(null);
   const [errors, setErrors] = useState<number>(0);
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [duration, setDuration] = useState<number>(30); // Default to 30 seconds
+  const [timeLeft, setTimeLeft] = useState<number>(0);
+  const [isTypingStarted, setIsTypingStarted] = useState<boolean>(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  // useEffect(() => {
-  //   // Focus input when component mounts
-  //   if (inputRef.current) {
-  //     inputRef.current.focus();
-  //   }
-  // }, []);
+  useEffect(() => {
+    // Focus input when component mounts
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
 
   useEffect(() => {
     // Reset state when sample text changes
     setUserInput("");
-    setStartTime(null);
     setErrors(0);
-    setWpm(0);
-  }, [sampleText]);
+    setIsTypingStarted(false);
+    setTimeLeft(duration);
+  }, [sampleText, duration]);
+
+  // Countdown timer effect
+  useEffect(() => {
+    if (timeLeft <= 0 && isTypingStarted) {
+      handleTimeUp();
+    }
+    if (isTypingStarted && timeLeft > 0) {
+      const timer = setTimeout(() => {
+        setTimeLeft((prevTime) => prevTime - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [timeLeft, isTypingStarted]);
+
+  const handleTimeUp = () => {
+    // Calculate words per minute
+    const wordsTyped = userInput.trim().split(/\s+/).length;
+    const wpm = wordsTyped / (duration / 60);
+
+    console.log("WPM: ", wpm);
+
+    // Calculate accuracy
+    const correctness =
+      sampleText.length - errors > 0 ? sampleText.length - errors : 0;
+    const accuracy = (correctness / sampleText.length) * 100;
+    const sessionData = {
+      wpm: wpm,
+      accuracy: accuracy,
+      mistakes: errors,
+      duration: duration,
+      typedText: userInput,
+    };
+    onComplete(sessionData);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (startTime === null) {
-      setStartTime(Date.now());
+    if (!isTypingStarted) {
+      setIsTypingStarted(true);
     }
 
     const input = e.target.value;
@@ -45,18 +86,11 @@ const TypingTest: React.FC<TypingTestProps> = ({ sampleText, onComplete }) => {
       }
     }
     setErrors(errorCount);
-    const endTime = Date.now();
-    const timeTaken = (endTime - startTime!) / 1000 / 60;
-    const words = input.split(" ").length;
-    const wpmResult = words / timeTaken;
-    const accuracy =
-      ((sampleText.length - errorCount) / sampleText.length) * 100;
-
-    setWpm(wpmResult);
 
     // Check if typing is complete
     if (input === sampleText) {
-      onComplete(wpm, accuracy);
+      setIsTypingStarted(false);
+      handleTimeUp();
     }
   };
 
@@ -78,6 +112,15 @@ const TypingTest: React.FC<TypingTestProps> = ({ sampleText, onComplete }) => {
           </span>
         ))}
       </div>
+      <select
+        disabled={isTypingStarted}
+        onChange={(e) => setDuration(parseInt(e.target.value))}
+      >
+        <option value="30">30s</option>
+        <option value="60">1min</option>
+        <option value="120">2min</option>
+      </select>
+
       <input
         ref={inputRef}
         type="text"
@@ -87,8 +130,9 @@ const TypingTest: React.FC<TypingTestProps> = ({ sampleText, onComplete }) => {
         placeholder="Start typing..."
         autoFocus
       />
+
       <div className="status">
-        <p>WPM: {wpm.toFixed(2)}</p>
+        <p>Time Left: {timeLeft}s</p>
         <p>Errors: {errors}</p>
       </div>
     </div>

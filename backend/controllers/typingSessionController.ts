@@ -3,18 +3,17 @@ import { decode, type JwtPayload } from "jsonwebtoken";
 const base = require("./baseController");
 import TypingSession from "../models/typingSessionModel";
 import type { NextFunction, Request, Response } from "express";
-const {
-  calculateAccuracy,
-  calculateMistakes,
-  calculateWPM,
-} = require("../utils/typing");
+
 import { decodeJWT } from "../utils/jwt";
 import AppError from "../utils/appError";
 interface SessionRequest extends AuthenticatedRequest {
   body: {
+    wpm: number;
+    mistakes: number;
     originalText: string;
     typedText: string;
     duration: number;
+    accuracy: number;
   };
 }
 
@@ -45,7 +44,9 @@ export const getUserTypingSessions = async (
 
     res.status(200).json({ typingSessions });
   } catch (err: any) {
-    res.status(500).json({ message: "Internal server error", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: err.message });
   }
 };
 
@@ -55,11 +56,13 @@ export const createTypingSession = async (
   next: NextFunction
 ) => {
   try {
-    const wpm = calculateWPM(req.body);
-    const accuracy = calculateAccuracy(req.body);
-    const mistakes = calculateMistakes(req.body);
-
-    const token = req.headers.authorization;
+    let token: string = "";
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+    ) {
+      token = req.headers.authorization.split(" ")[1];
+    }
     const decoded = decodeJWT(token);
 
     if (!decoded) {
@@ -70,12 +73,19 @@ export const createTypingSession = async (
 
     const userId = decoded?.id;
 
+    const { wpm, mistakes, originalText, typedText, duration, accuracy } =
+      req.body;
+
+    console.log(req.body);
+
     const session = await TypingSession.create({
-      ...req.body,
       userId,
       wpm,
       accuracy,
       mistakes,
+      originalText,
+      typedText,
+      duration,
     });
 
     res.status(201).json({
@@ -83,7 +93,9 @@ export const createTypingSession = async (
       data: session,
     });
   } catch (err: any) {
-    res.status(500).json({ message: "Internal server error", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: err.message });
   }
 };
 
