@@ -79,7 +79,7 @@ const HistoryModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
                 sessions.map((session) => (
                   <tr key={session._id}>
                     <td>{session.wpm}</td>
-                    <td>{session.accuracy}</td>
+                    <td>{session.accuracy.toFixed(2)}</td>
                     <td>{session.mistakes}</td>
                     <td>{session.duration}</td>
                   </tr>

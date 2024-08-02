@@ -79,8 +79,6 @@ export const createTypingSession = async (
     const { wpm, mistakes, originalText, typedText, duration, accuracy } =
       req.body;
 
-    console.log(req.body);
-
     const session = await TypingSession.create({
       userId,
       wpm,
